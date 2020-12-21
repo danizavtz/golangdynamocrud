@@ -12,6 +12,9 @@ func healthCheck(c *gin.Context) {
 		"msg": "server up and runnning",
 	})
 }
+func generateIndexForDynamo() string {
+	return "users:"+uuid.New().String()
+}
 
 func addNewUser(c *gin.Context) {
 	var newUserDetail model.Detalhe
@@ -25,7 +28,7 @@ func addNewUser(c *gin.Context) {
 	}
 
 	newUser := model.Usuario{
-		Identificador: "users:"+uuid.New().String(),
+		Identificador: generateIndexForDynamo(),
 		Detalhes: newUserDetail,
 	}
 
@@ -50,7 +53,7 @@ func addNewUser(c *gin.Context) {
 	c.Header("URI", newUser.Identificador)
 	c.JSON(http.StatusCreated, gin.H{
 		"data": "Item created with success",
-		"Uri": "/user/"+newUser.Identificador,
+		"Uri": "/users/"+newUser.Identificador,
 	})
 }
 
