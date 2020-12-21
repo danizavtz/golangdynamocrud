@@ -23,10 +23,12 @@ func addNewUser(c *gin.Context) {
 		})
 		return
 	}
-	id := uuid.New()
-	var newUser model.Usuario
-	newUser.Identificador = id.String()
-	newUser.Detalhes = newUserDetail
+
+	newUser := model.Usuario{
+		Identificador:uuid.New().String(),
+		Detalhes: newUserDetail,
+	}
+
 	dynamoMapForInclusion, err := services.MarshalMapForAttributes(newUser)
 	if err != nil {
 		errMsg := "The fields idade, nome and profissao are required"
@@ -45,9 +47,9 @@ func addNewUser(c *gin.Context) {
 		})
 		return
 	}
-	c.Header("URI", id.String())
+	c.Header("URI", newUser.Identificador)
 	c.JSON(http.StatusCreated, gin.H{
 		"data": "Item created with success",
-		"Uri": "/user/"+id.String(),
+		"Uri": "/user/"+newUser.Identificador,
 	})
 }
