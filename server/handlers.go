@@ -25,7 +25,7 @@ func addNewUser(c *gin.Context) {
 	}
 
 	newUser := model.Usuario{
-		Identificador:uuid.New().String(),
+		Identificador: "users:"+uuid.New().String(),
 		Detalhes: newUserDetail,
 	}
 
@@ -52,4 +52,19 @@ func addNewUser(c *gin.Context) {
 		"data": "Item created with success",
 		"Uri": "/user/"+newUser.Identificador,
 	})
+}
+
+func getAllUsers(c *gin.Context) {
+	lista, err := services.AssembleUsersList()
+	if err != nil {
+		errMsg := "There was an error to send data to dynamodb instance"
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"data": errMsg,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data": lista,
+	})
+
 }

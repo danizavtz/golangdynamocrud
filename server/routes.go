@@ -7,6 +7,7 @@ import (
 func LoadRoutes() {
 	r := gin.Default()
 	r.GET("/health-check", healthCheck)
-	r.POST("/user", addNewUser)
+	r.POST("/users", addNewUser)
+	r.GET("/users", getAllUsers)
 	r.Run()
 }
