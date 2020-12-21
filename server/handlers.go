@@ -69,5 +69,33 @@ func getAllUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"data": lista,
 	})
+}
 
+func getItemById(c *gin.Context) {
+	identifier := c.Param("id")
+	result, err := services.GetItemById(identifier)
+	if err != nil {
+		errMsg := "There was an error to send data to dynamodb instance"
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"data": errMsg,
+		})
+		return
+	}
+	if result == nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"data": "Not found",
+		})
+		return
+	}
+	item, err := services.AssembleUserItem(result)
+	if err != nil {
+		errMsg := "There was an error to unmarshall item to model instance"
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"data": errMsg,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data": item,
+	})
 }

@@ -9,5 +9,6 @@ func LoadRoutes() {
 	r.GET("/health-check", healthCheck)
 	r.POST("/users", addNewUser)
 	r.GET("/users", getAllUsers)
+	r.GET("/users/:id", getItemById)
 	r.Run()
 }

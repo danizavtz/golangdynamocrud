@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/expression"
 	"sync"
 	"os"
+	// "strings"
 )
 var singleton sync.Once
 var instance *dynamodb.DynamoDB
@@ -36,6 +37,33 @@ func AssembleDynamoItem(itemMarshalled map[string]*dynamodb.AttributeValue) *dyn
 	return input
 }
 
+func assembleItemForGetById(inputIdentifier string) (*dynamodb.GetItemInput){
+	item := dynamodb.GetItemInput{
+		TableName: aws.String(os.Getenv("TABLE")),
+		Key: map[string]*dynamodb.AttributeValue{
+			"identifier": {
+				S: aws.String("users:"+inputIdentifier),
+			},
+		},
+	}
+	return &item
+}
+func GetItemById(identificador string) (map[string]*dynamodb.AttributeValue, error) {
+	result, err := GetDynamoInstance().GetItem(assembleItemForGetById(identificador))
+	if err != nil {
+		return nil, err
+	}
+	return result.Item, nil
+}
+func AssembleUserItem(result map[string]*dynamodb.AttributeValue) (model.Usuario, error) {
+	var item model.Usuario
+
+	err := dynamodbattribute.UnmarshalMap(result, &item)
+	if err != nil {
+		return item, err
+	}
+	return item, nil
+}
 func GenerateFilterForQueryUsers()(*dynamodb.ScanInput , error){
 	filt := expression.Name("identifier").BeginsWith("users:")
 	proj := expression.NamesList(expression.Name("identifier"), expression.Name("idade"), expression.Name("nome"), expression.Name("profissao"))
@@ -61,10 +89,11 @@ func AssembleUsersList()([]model.Usuario, error){
 	if err != nil {
 		return listUsers, err
 	}
-	var itemUser = model.Usuario{}
+	var itemUser model.Usuario
 	dynamoItems, err := GetDynamoInstance().Scan(filterForTable)
 	for _, i := range dynamoItems.Items {
 		itemUser = model.Usuario{}
+	 	
 		err = dynamodbattribute.UnmarshalMap(i, &itemUser)
 
 		if err != nil {
