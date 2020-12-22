@@ -10,5 +10,6 @@ func LoadRoutes() {
 	r.POST("/users", addNewUser)
 	r.GET("/users", getAllUsers)
 	r.GET("/users/:id", getItemById)
+	r.DELETE("/users/:id", deleteItemById)
 	r.Run()
 }

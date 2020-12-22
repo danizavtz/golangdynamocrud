@@ -99,3 +99,15 @@ func getItemById(c *gin.Context) {
 		"data": item,
 	})
 }
+
+func deleteItemById(c *gin.Context) {
+	err := services.DeleteItemById(c.Param("id"))
+	if err != nil {
+		errMsg := "There was an error to unmarshall item to model instance"
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"data": errMsg,
+		})
+		return
+	}
+	c.JSON(http.StatusNoContent, nil)
+}

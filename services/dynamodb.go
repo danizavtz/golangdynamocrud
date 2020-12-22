@@ -48,6 +48,19 @@ func assembleItemForGetById(inputIdentifier string) (*dynamodb.GetItemInput){
 	}
 	return &item
 }
+
+func assembleItemForDeleteById(inputIdentifier string) (*dynamodb.DeleteItemInput) {
+	item := dynamodb.DeleteItemInput{
+		Key: map[string]*dynamodb.AttributeValue{
+			"identifier": {
+				S: aws.String("users:"+inputIdentifier),
+			},
+		},
+		TableName: aws.String(os.Getenv("TABLE")),
+	}
+	return &item
+}
+
 func GetItemById(identificador string) (map[string]*dynamodb.AttributeValue, error) {
 	result, err := GetDynamoInstance().GetItem(assembleItemForGetById(identificador))
 	if err != nil {
@@ -102,4 +115,9 @@ func AssembleUsersList()([]model.Usuario, error){
 		listUsers = append(listUsers, itemUser)
 	}
 	return listUsers, nil
+}
+
+func DeleteItemById(identifier string) (error) {
+	_, err  := GetDynamoInstance().DeleteItem(assembleItemForDeleteById(identifier))
+	return err
 }
