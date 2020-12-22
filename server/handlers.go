@@ -103,16 +103,14 @@ func deleteItemById(c *gin.Context) {
 
 func updateItemById(c *gin.Context) {
 	var detalhe model.Detalhe
-	err := c.ShouldBindJSON(&detalhe)
-	if err != nil {
+	if err := c.ShouldBindJSON(&detalhe); err != nil {
 		errMsg := "The fields idade, nome and profissao are required"
 		c.JSON(http.StatusBadRequest, gin.H{
 			"data": errMsg,
 		})
 		return
 	}
-	err = services.UpdateItemById(c.Param("id"), detalhe)
-	if err != nil {
+	if err := services.UpdateItemById(c.Param("id"), detalhe); err != nil {
 		errMsg := "There was an error to unmarshall item to model instance"
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"data": errMsg,
