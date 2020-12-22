@@ -9,24 +9,29 @@ import (
 	"sync"
 	"os"
 	"strconv"
+	"github.com/google/uuid"
 )
-var singleton sync.Once
+var once sync.Once
 var instance *dynamodb.DynamoDB
 
+func generateIndexForDynamo() string {
+	return "users:"+uuid.New().String()
+}
+
 func GetDynamoInstance() *dynamodb.DynamoDB {
-	singleton.Do(func () {
+	once.Do(func () {
 		sess := GetAwsSession()
 		instance = dynamodb.New(sess)
 	})
 	return instance
 }
 
-func MarshalMapForAttributes(item model.Usuario) (map[string]*dynamodb.AttributeValue, error) {
-	av, err := dynamodbattribute.MarshalMap(item)
-	if err != nil {
-		return nil, err
+func MarshalMapForAttributes(detail model.Detalhe) (map[string]*dynamodb.AttributeValue, error) {
+	newUser := model.Usuario{
+		Identificador: generateIndexForDynamo(),
+		Detalhes: detail,
 	}
-	return av, nil
+	return dynamodbattribute.MarshalMap(newUser)
 }
 
 func AssembleDynamoItem(itemMarshalled map[string]*dynamodb.AttributeValue) *dynamodb.PutItemInput {
