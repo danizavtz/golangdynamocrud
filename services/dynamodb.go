@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/dynamodb/expression"
 	"sync"
 	"os"
-	// "strings"
+	"strconv"
 )
 var singleton sync.Once
 var instance *dynamodb.DynamoDB
@@ -59,6 +59,31 @@ func assembleItemForDeleteById(inputIdentifier string) (*dynamodb.DeleteItemInpu
 		TableName: aws.String(os.Getenv("TABLE")),
 	}
 	return &item
+}
+
+func assembleItemForUpdateById(inputIdentifier string, usuario model.Detalhe) (*dynamodb.UpdateItemInput) {
+	input := &dynamodb.UpdateItemInput{
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+			":newIdade": {
+				N: aws.String(strconv.Itoa(usuario.Idade)),
+			},
+			":newNome": {
+				S: aws.String(usuario.Nome),
+			},
+			":newProfissao": {
+				S: aws.String(usuario.Profissao),
+			},
+		},
+		TableName: aws.String(os.Getenv("TABLE")),
+		Key: map[string]*dynamodb.AttributeValue{
+			"identifier": {
+				S: aws.String("users:"+inputIdentifier),
+			},
+		},
+		// ReturnValues:     aws.String("UPDATED_NEW"),
+		UpdateExpression: aws.String("set idade = :newIdade, nome = :newNome, profissao = :newProfissao"),
+	}
+	return input
 }
 
 func GetItemById(identificador string) (map[string]*dynamodb.AttributeValue, error) {
@@ -119,5 +144,10 @@ func AssembleUsersList()([]model.Usuario, error){
 
 func DeleteItemById(identifier string) (error) {
 	_, err  := GetDynamoInstance().DeleteItem(assembleItemForDeleteById(identifier))
+	return err
+}
+
+func UpdateItemById(identifier string, detalhe model.Detalhe)(error) {
+	_, err := GetDynamoInstance().UpdateItem(assembleItemForUpdateById(identifier, detalhe))
 	return err
 }

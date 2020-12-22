@@ -11,5 +11,6 @@ func LoadRoutes() {
 	r.GET("/users", getAllUsers)
 	r.GET("/users/:id", getItemById)
 	r.DELETE("/users/:id", deleteItemById)
+	r.PUT("/users/:id", updateItemById)
 	r.Run()
 }

@@ -111,3 +111,26 @@ func deleteItemById(c *gin.Context) {
 	}
 	c.JSON(http.StatusNoContent, nil)
 }
+
+func updateItemById(c *gin.Context) {
+	var detalhe model.Detalhe
+	err := c.ShouldBindJSON(&detalhe)
+	if err != nil {
+		errMsg := "The fields idade, nome and profissao are required"
+		c.JSON(http.StatusBadRequest, gin.H{
+			"data": errMsg,
+		})
+		return
+	}
+	err = services.UpdateItemById(c.Param("id"), detalhe)
+	if err != nil {
+		errMsg := "There was an error to unmarshall item to model instance"
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"data": errMsg,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data": "Data updated with success",
+	})
+}
