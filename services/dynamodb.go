@@ -81,7 +81,7 @@ func assembleItemForUpdateById(inputIdentifier string, usuario model.Detalhe) (*
 			},
 		},
 		// ReturnValues:     aws.String("UPDATED_NEW"),
-		UpdateExpression: aws.String("set idade = :newIdade, nome = :newNome, profissao = :newProfissao"),
+		UpdateExpression: aws.String("set detalhe.idade = :newIdade, detalhe.nome = :newNome, detalhe.profissao = :newProfissao"),
 	}
 	return input
 }
